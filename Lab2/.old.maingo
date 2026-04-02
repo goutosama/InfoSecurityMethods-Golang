@@ -1,0 +1,102 @@
+//package main
+
+/*import (
+	"fmt"
+	"unicode"
+)
+
+func main() {
+	var phrase string = "ЭТОСООБЩЕНИЕНУЖНОЗАКОДИРОВАТЬ"
+	var codeword string = "ШИФР"
+	var codeRune []rune = []rune(codeword)
+	var phraseRune []rune = []rune(phrase)
+
+	// var codeIndex int = 0
+	// for i := range phraseRune {
+	// 	fmt.Println(string(phraseRune[i]), getShift(codeRune[codeIndex]), string(shiftLetter(phraseRune[i], getShift(codeRune[codeIndex]))))
+	// 	if codeIndex < len(codeRune)-1 {
+	// 		codeIndex++
+	// 	} else {
+	// 		codeIndex = 0
+	// 	}
+	// }
+	fmt.Println(codeRune, phraseRune)
+	for i := range ruAlphabet {
+		fmt.Println(string(ruAlphabet[i]), getShift(ruAlphabet[i]))
+	}
+}
+
+func shiftLetter(r rune, shift int) rune {
+	if !unicode.IsLetter(r) {
+		return r // Return as is if not a letter (e.g., space, punctuation, digit)
+	}
+
+	// Example for basic ASCII a-z:
+	if r >= 'a' && r <= 'z' {
+		return 'a' + (r-'a'+rune(shift))%26
+	}
+	// Example for basic ASCII A-Z:
+	if r >= 'A' && r <= 'Z' {
+		return 'A' + (r-'A'+rune(shift))%26
+	}
+	// For russian
+	if r >= 'а' && r <= 'я' {
+		return 'а' + (r-'а'+rune(shift))%33
+	}
+	if r >= 'А' && r <= 'Я' {
+		return 'А' + (r-'А'+rune(shift))%33
+	}
+
+	return r // Return other letters as is, as a generic shift is non-trivial
+}
+
+var ruAlphabet = []rune{
+	'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л', 'М', 'Н', 'О',
+	'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я',
+}
+
+var ruAlphabetLower = []rune{
+	'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о',
+	'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я',
+}
+
+var ruIndex = func() map[rune]int {
+	m := make(map[rune]int)
+	for i, r := range ruAlphabet {
+		m[r] = i
+		m[unicode.ToLower(r)] = i
+	}
+	return m
+}()
+
+var ruIndexLower = func() map[rune]int {
+	m := make(map[rune]int)
+	for i, r := range ruAlphabetLower {
+		m[r] = i
+		m[unicode.ToLower(r)] = i
+	}
+	return m
+}()
+
+func getShift(r rune) int {
+	if !unicode.IsLetter(r) {
+		return 0 // Return as is if not a letter (e.g., space, punctuation, digit)
+	}
+
+	if val, ok := ruIndex[r]; ok {
+		return val
+	}
+
+	if val, ok := ruIndexLower[r]; ok {
+		return val
+	}
+
+	if r >= 'a' && r <= 'z' {
+		return int(r - 'a')
+	}
+	if r >= 'A' && r <= 'Z' {
+		return int(r - 'A')
+	}
+
+	return 0
+}

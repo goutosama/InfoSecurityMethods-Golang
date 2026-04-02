@@ -1,0 +1,83 @@
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+func main() {
+	var phrase string = "КОМПОЗИТ"
+	var key string = "КОМБАЙН"
+
+	res := encode(phrase, key, 4, 16)
+	fmt.Println(string(res))
+	res = decode(string(res), key, 4, 16)
+	fmt.Println(string(res))
+}
+
+func encode(phrase string, key string, blockSize int, count int) []rune {
+	result := []rune(phrase)
+	var left_part = []rune(strings.Repeat("0", blockSize))
+	var right_part = []rune(strings.Repeat("0", blockSize))
+	var temp []rune
+	for d := 0; d < len(phrase)-len(phrase)%(2*blockSize); d += 2 * blockSize {
+		left_part = []rune(phrase[d:min(d+blockSize-1, len(phrase))])
+		right_part = []rune(phrase[min(d+blockSize, len(phrase)):min(d+2*blockSize-1, len(phrase))])
+		for i := 0; i < count; i++ {
+			temp = xor(left_part, F(right_part, []rune(key), i))
+			left_part = right_part
+			right_part = temp
+		}
+		result = insert(result, left_part, d)
+		result = insert(result, right_part, d+blockSize)
+	}
+	return result
+}
+
+func xor(subblock []rune, key []rune) []rune {
+	result := make([]rune, len(subblock))
+	copy(result, subblock)
+	keyR := []rune(key)
+	for i := 0; i < len(subblock); i++ {
+		result[i] = subblock[i] ^ keyR[i%len(keyR)]
+	}
+	return result
+}
+
+func F(subblock []rune, key []rune, round int) []rune {
+	result := make([]rune, len(subblock))
+	copy(result, subblock)
+	for i := range len(result) {
+		result[i] = result[i] ^ key[round%len(key)]
+	}
+	return result
+}
+
+func insert(dest []rune, val []rune, startIndex int) []rune {
+	result := []rune(dest)
+	for i := 0; i < min(len(val), (len(dest)-startIndex)); i++ {
+		result[startIndex+i] = val[i]
+	}
+	return result
+}
+
+func decode(phrase string, key string, blockSize int, count int) []rune {
+	result := []rune(phrase)
+	var left_part = []rune(strings.Repeat("0", blockSize))
+	var right_part = []rune(strings.Repeat("0", blockSize))
+	var temp []rune
+	for d := 0; d < len(phrase)-len(phrase)%(2*blockSize); d += 2 * blockSize {
+
+		left_part = []rune(phrase[d : d+blockSize-1])
+		right_part = []rune(phrase[d+blockSize : d+2*blockSize-1])
+
+		for i := count - 1; i >= 0; i-- {
+			temp = xor(right_part, F(left_part, []rune(key), i))
+			right_part = left_part
+			left_part = temp
+		}
+		result = insert(result, left_part, d)
+		result = insert(result, right_part, d+blockSize)
+	}
+	return result
+}

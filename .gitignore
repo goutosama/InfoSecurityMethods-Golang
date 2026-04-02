@@ -30,3 +30,8 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+<<<<<<< HEAD
+=======
+
+*.bkp
+>>>>>>> 0f59c46 (Initial commit)
